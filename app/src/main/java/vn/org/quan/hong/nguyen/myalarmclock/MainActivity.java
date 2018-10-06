@@ -17,10 +17,13 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
+import vn.org.quan.hong.nguyen.myalarmclock.RoomDatabase.RoomAlarmDatabase;
 
 // feature: avoid duplicate
 
@@ -35,10 +38,21 @@ public class MainActivity extends AppCompatActivity {
     public static final int CANCEL_ALL_KEY = 1489;
     List<Alarm> malarmList = new ArrayList<>();
 
+    RoomAlarmDatabase alarmDatabase;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        alarmDatabase = RoomAlarmDatabase.getInstance(this);
+
+        if (alarmDatabase.alarmDao().countAlarm() != 0){
+            malarmList = alarmDatabase.alarmDao().getDatabse();
+            AlarmAdapter alarmAdapter = new AlarmAdapter(malarmList, this);
+            RecyclerView recyclerView = findViewById(R.id.vRecyclerView);
+            recyclerView.setAdapter(alarmAdapter);
+        }
 
         toolbar = findViewById(R.id.mainToolbar);
         title = findViewById(R.id.txtTitle);
@@ -68,6 +82,7 @@ public class MainActivity extends AppCompatActivity {
 
             if (!duplicateExist(malarmList , resultAlarm)){
                 malarmList.add(resultAlarm);
+                alarmDatabase.alarmDao().insertAll(resultAlarm);
             }
 
 
@@ -126,6 +141,9 @@ public class MainActivity extends AppCompatActivity {
 
                 }
             }
+
+            alarmDatabase.alarmDao().nukeDatabase();
+            alarmDatabase.alarmDao().insertAll(malarmList);
 
             if (AlarmAdapter.requestCodeArrayList.size() == 0){
 
@@ -187,6 +205,9 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
 
+            alarmDatabase.alarmDao().nukeDatabase();
+            alarmDatabase.alarmDao().insertAll(malarmList);
+
 
             if (AlarmAdapter.requestCodeArrayList.size() == 0){
 
@@ -238,4 +259,9 @@ public class MainActivity extends AppCompatActivity {
         return result;
     }
 
+    @Override
+    protected void onDestroy() {
+        RoomAlarmDatabase.destroyInstance();
+        super.onDestroy();
+    }
 }

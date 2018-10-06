@@ -66,7 +66,7 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.ViewHolder> 
 
         holder.alarmManager = (AlarmManager) mContext.getSystemService(Context.ALARM_SERVICE);
 
-        holder.txtHourMinute.setText(alarm.getsHour() + ":" + alarm.getsMinute());
+        holder.txtHourMinute.setText(alarm.getSHour() + ":" + alarm.getSMinute());
         holder.txtAmPm.setText(alarm.getAmOrPm());
 
         holder.btnOnOff.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
