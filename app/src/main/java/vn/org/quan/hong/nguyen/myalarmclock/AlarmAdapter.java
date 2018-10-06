@@ -40,11 +40,7 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.ViewHolder> 
 
     List<Alarm> alarmList;
     private Context mContext;
-
-
-
-
-
+    
     public AlarmAdapter(List<Alarm> alarmList, Context mContext) {
         this.alarmList = alarmList;
         this.mContext = mContext;
