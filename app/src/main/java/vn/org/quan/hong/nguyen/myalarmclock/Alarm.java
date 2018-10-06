@@ -39,26 +39,34 @@ public class Alarm {
         this.minute = minute;
 
         if(hour >=0 && minute >=0){
-         if(hour >=12){
-          amOrPm = "Pm";
-          sHour = String.valueOf(hour - 12);
-         } else {
-             amOrPm = "Am";
-             sHour = String.valueOf(hour);
-         }
+            setStringAccordingToIntHour(hour);
 
-         if (minute <10){
-             sMinute = "0"+ minute;
-         } else {
-             sMinute = String.valueOf(minute);
-         }
-
-         if (Integer.valueOf(sHour) <10) {
-             sHour = "0" + sHour;
-         }
+            setStringAccordingToIntMinute(minute);
         }
 
         alarmId = sHour+sMinute+amOrPm;
+    }
+
+    private void setStringAccordingToIntMinute(int minute) {
+        if (minute <10){
+         sMinute = "0"+ minute;
+     } else {
+         sMinute = String.valueOf(minute);
+     }
+    }
+
+    private void setStringAccordingToIntHour(int hour) {
+        if(hour >=12){
+         amOrPm = "Pm";
+         sHour = String.valueOf(hour - 12);
+        } else {
+            amOrPm = "Am";
+            sHour = String.valueOf(hour);
+        }
+
+        if (Integer.valueOf(sHour) <10) {
+            sHour = "0" + sHour;
+        }
     }
 
     public String getAmOrPm() {
@@ -72,17 +80,7 @@ public class Alarm {
 
     public void setHour(int hour) {
         this.hour = hour;
-        if(hour >12){
-            amOrPm = "Pm";
-            sHour = String.valueOf(hour - 12);
-        } else {
-            amOrPm = "Am";
-            sHour = String.valueOf(hour);
-        }
-
-        if (Integer.valueOf(sHour) <10) {
-            sHour = "0" + sHour;
-        }
+        setStringAccordingToIntHour(hour);
 
         alarmId = sHour+sMinute+amOrPm;
     }
@@ -93,11 +91,7 @@ public class Alarm {
 
     public void setMinute(int minute) {
         this.minute = minute;
-        if (minute <10){
-            sMinute = "0"+ minute;
-        } else {
-            sMinute = String.valueOf(minute);
-        }
+        setStringAccordingToIntMinute(minute);
 
         alarmId = sHour+sMinute+amOrPm;
     }

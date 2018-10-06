@@ -15,7 +15,7 @@ public interface AlarmDao {
     void insertAll(List<Alarm> alarms);
 
     @Insert
-    void insertAll(Alarm...alarms);
+    void insertAlarm(Alarm...alarms);
 
     @Query("SELECT COUNT(*) from alarm")
     int countAlarm();

@@ -6,7 +6,6 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.NonNull;
-import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.ContextMenu;
@@ -16,15 +15,14 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CompoundButton;
-import android.widget.CursorAdapter;
 import android.widget.TextView;
-import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
-import java.util.UUID;
+
+import vn.org.quan.hong.nguyen.myalarmclock.MethodInterfaceEnum.Command;
 
 // feature: many alarm and seperate
 // feature : on off button 1 adapter will not affect other not finish
@@ -40,7 +38,7 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.ViewHolder> 
 
     List<Alarm> alarmList;
     private Context mContext;
-    
+
     public AlarmAdapter(List<Alarm> alarmList, Context mContext) {
         this.alarmList = alarmList;
         this.mContext = mContext;
@@ -49,11 +47,7 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.ViewHolder> 
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        LayoutInflater layoutInflater = LayoutInflater.from(mContext);
-        View alarmView = layoutInflater.inflate(R.layout.alarm_detail , parent , false);
-        ViewHolder viewHolder = new ViewHolder(alarmView);
-
-        return viewHolder;
+        return Command.inflateNewViewForAdapter(mContext , parent);
     }
 
     @Override
@@ -72,66 +66,21 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.ViewHolder> 
                     holder.alarmCalendar = Calendar.getInstance();
 
                     if (holder.alarmCalendar.get(Calendar.HOUR_OF_DAY)< alarm.getHour()){
-
-                        holder.alarmCalendar.set(Calendar.HOUR_OF_DAY , alarm.getHour());
-                        holder.alarmCalendar.set(Calendar.MINUTE , alarm.getMinute());
-                        holder.alarmCalendar.set(Calendar.SECOND , 0);
-                        holder.setAlarmIntent = new Intent(mContext , AlarmReceiver.class );
-                        holder.setAlarmIntent.putExtra(FROM_ALARM_ADAPTER_KEY , SET_ALARM_KEY);
-                        holder.setAlarmIntent.putExtra(ADAPTER_ID_KEY , holder.getAdapterPosition());
-                        holder.setAlarmPendingIntent = PendingIntent.getBroadcast(mContext , holder.getAdapterPosition() ,
-                                holder.setAlarmIntent , PendingIntent.FLAG_UPDATE_CURRENT);
-                        requestCodeArrayList.add(holder.getAdapterPosition());
-                        holder.alarmManager.setRepeating(AlarmManager.RTC_WAKEUP ,
-                                holder.alarmCalendar.getTimeInMillis() , AlarmManager.INTERVAL_DAY ,holder.setAlarmPendingIntent);
+                        Command.setupAlarm(mContext, holder , alarm , requestCodeArrayList , false);
 
                     } else if (holder.alarmCalendar.get(Calendar.HOUR_OF_DAY) == alarm.getHour()
                             && holder.alarmCalendar.get(Calendar.MINUTE) < alarm.getMinute()){
 
-                        holder.alarmCalendar.set(Calendar.HOUR_OF_DAY , alarm.getHour());
-                        holder.alarmCalendar.set(Calendar.MINUTE , alarm.getMinute());
-                        holder.alarmCalendar.set(Calendar.SECOND , 0);
-                        holder.setAlarmIntent = new Intent(mContext , AlarmReceiver.class );
-                        holder.setAlarmIntent.putExtra(FROM_ALARM_ADAPTER_KEY , SET_ALARM_KEY);
-                        holder.setAlarmIntent.putExtra(ADAPTER_ID_KEY , holder.getAdapterPosition());
-                        holder.setAlarmPendingIntent = PendingIntent.getBroadcast(mContext , holder.getAdapterPosition() ,
-                                holder.setAlarmIntent , PendingIntent.FLAG_UPDATE_CURRENT);
-                        requestCodeArrayList.add(holder.getAdapterPosition());
-                        holder.alarmManager.setRepeating(AlarmManager.RTC_WAKEUP ,
-                                holder.alarmCalendar.getTimeInMillis() , AlarmManager.INTERVAL_DAY ,holder.setAlarmPendingIntent);
+                        Command.setupAlarm(mContext, holder ,alarm , requestCodeArrayList , false);
 
                     } else if (holder.alarmCalendar.get(Calendar.HOUR_OF_DAY) > alarm.getHour()){
 
-                        holder.alarmCalendar.add(Calendar.DATE , 1);
-                        holder.alarmCalendar.set(Calendar.HOUR_OF_DAY , alarm.getHour());
-                        holder.alarmCalendar.set(Calendar.MINUTE , alarm.getMinute());
-                        holder.alarmCalendar.set(Calendar.SECOND , 0);
-                        holder.setAlarmIntent = new Intent(mContext , AlarmReceiver.class );
-                        holder.setAlarmIntent.putExtra(FROM_ALARM_ADAPTER_KEY , SET_ALARM_KEY);
-                        holder.setAlarmIntent.putExtra(ADAPTER_ID_KEY , holder.getAdapterPosition());
-                        holder.setAlarmPendingIntent = PendingIntent.getBroadcast(mContext , holder.getAdapterPosition() ,
-                                holder.setAlarmIntent , PendingIntent.FLAG_UPDATE_CURRENT);
-                        requestCodeArrayList.add(holder.getAdapterPosition());
-                        holder.alarmManager.setRepeating(AlarmManager.RTC_WAKEUP ,
-                                holder.alarmCalendar.getTimeInMillis() , AlarmManager.INTERVAL_DAY ,holder.setAlarmPendingIntent);
+                        Command.setupAlarm(mContext, holder , alarm ,requestCodeArrayList , true);
 
                     } else if (holder.alarmCalendar.get(Calendar.HOUR_OF_DAY) == alarm.getHour()
                             && holder.alarmCalendar.get(Calendar.MINUTE) >= alarm.getMinute()){
 
-                        holder.alarmCalendar.add(Calendar.DATE , 1);
-
-                        holder.alarmCalendar.set(Calendar.HOUR_OF_DAY , alarm.getHour());
-                        holder.alarmCalendar.set(Calendar.MINUTE , alarm.getMinute());
-                        holder.alarmCalendar.set(Calendar.SECOND , 0);
-                        holder.setAlarmIntent = new Intent(mContext , AlarmReceiver.class );
-                        holder.setAlarmIntent.putExtra(ADAPTER_ID_KEY , holder.getAdapterPosition());
-                        holder.setAlarmIntent.putExtra(FROM_ALARM_ADAPTER_KEY , SET_ALARM_KEY);
-
-                        holder.setAlarmPendingIntent = PendingIntent.getBroadcast(mContext , holder.getAdapterPosition() ,
-                                holder.setAlarmIntent , PendingIntent.FLAG_UPDATE_CURRENT);
-                        requestCodeArrayList.add(holder.getAdapterPosition());
-                        holder.alarmManager.setRepeating(AlarmManager.RTC_WAKEUP ,
-                                holder.alarmCalendar.getTimeInMillis() , AlarmManager.INTERVAL_DAY ,holder.setAlarmPendingIntent);
+                        Command.setupAlarm(mContext, holder , alarm ,requestCodeArrayList , true);
 
                     }
 
@@ -168,7 +117,7 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.ViewHolder> 
         public Intent setAlarmIntent;
         public PendingIntent setAlarmPendingIntent;
         public AlarmManager alarmManager;
-        Calendar alarmCalendar;
+        public Calendar alarmCalendar;
         int test = 0;
 
 
@@ -207,25 +156,15 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.ViewHolder> 
             switch (item.getItemId()){
 
                 case R.id.editAlarm:
-                    Intent editIntent = new Intent(mView.getContext() , TimePicker.class);
-                    editIntent.putExtra(OLD_HH_MM_STRING_KEY , txtHourMinute.getText());
-                    editIntent.putExtra(AM_PM_KEY , txtAmPm.getText());
-                    editIntent.setAction(Intent.ACTION_EDIT);
-                    ((Activity) mView.getContext()).startActivityForResult(editIntent , EDIT_REQUEST_CODE);
+                    Command.sendIntentFromContextMenu(mView , txtHourMinute,txtAmPm, EDIT_REQUEST_CODE);
                     break;
 
                 case R.id.deleteAlarm:
-                    Intent deleteIntent = new Intent(mView.getContext() , TimePicker.class);
-                    deleteIntent.putExtra(OLD_HH_MM_STRING_KEY , txtHourMinute.getText());
-                    deleteIntent.putExtra(AM_PM_KEY , txtAmPm.getText());
-                    deleteIntent.setAction(Intent.ACTION_DELETE);
-                    ((Activity) mView.getContext()).startActivityForResult(deleteIntent ,DELETE_REQUEST_CODE);
+                    Command.sendIntentFromContextMenu(mView,txtHourMinute,txtAmPm,DELETE_REQUEST_CODE);
                     break;
 
             }
             return true;
         }
-
     }
-
 }

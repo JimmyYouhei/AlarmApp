@@ -32,15 +32,10 @@ public class AlarmService extends Service {
         if (intent.getStringExtra(AlarmReceiver.FROM_ALARM_RECEIVER_KEY).equals(AlarmAdapter.SET_ALARM_KEY)){
 
             if (mediaPlayer == null){
-                runningAdapterId = intent.getIntExtra(AlarmAdapter.ADAPTER_ID_KEY , -10);
-                mediaPlayer = MediaPlayer.create(this, R.raw.legends);
-                mediaPlayer.start();
+                playAlarmSound(intent);
             } else {
-                mediaPlayer.stop();
-                mediaPlayer.reset();
-                runningAdapterId = intent.getIntExtra(AlarmAdapter.ADAPTER_ID_KEY , -10);
-                mediaPlayer = MediaPlayer.create(this, R.raw.legends);
-                mediaPlayer.start();
+                stopAlarmSound();
+                playAlarmSound(intent);
             }
 
         } else if (intent.getStringExtra(AlarmReceiver.FROM_ALARM_RECEIVER_KEY).equals(AlarmAdapter.STOP_KEY)){
@@ -48,22 +43,31 @@ public class AlarmService extends Service {
 
             if (receivedAdapterId== MainActivity.CANCEL_ALL_KEY){
                 if(mediaPlayer != null){
-                    mediaPlayer.stop();
-                    mediaPlayer.reset();
+                    stopAlarmSound();
                     runningAdapterId = -100;
                     receivedAdapterId = -10;
 
                 }
             } else if (receivedAdapterId == runningAdapterId)
             if(mediaPlayer != null){
-                    mediaPlayer.stop();
-                    mediaPlayer.reset();
+                stopAlarmSound();
                     runningAdapterId = -100;
                     receivedAdapterId = -10;
             }
         }
 
         return START_NOT_STICKY;
+    }
+
+    private void playAlarmSound(Intent intent) {
+        runningAdapterId = intent.getIntExtra(AlarmAdapter.ADAPTER_ID_KEY , -10);
+        mediaPlayer = MediaPlayer.create(this, R.raw.legends);
+        mediaPlayer.start();
+    }
+
+    private void stopAlarmSound() {
+        mediaPlayer.stop();
+        mediaPlayer.reset();
     }
 
 
