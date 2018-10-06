@@ -30,5 +30,4 @@ public abstract class RoomAlarmDatabase extends RoomDatabase {
     public static void destroyInstance() {
         instance = null;
     }
-
 }
