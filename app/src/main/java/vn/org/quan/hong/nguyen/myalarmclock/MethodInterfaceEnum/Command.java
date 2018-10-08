@@ -32,7 +32,10 @@ import static vn.org.quan.hong.nguyen.myalarmclock.AlarmTimePicker.HOUR_KEY;
 import static vn.org.quan.hong.nguyen.myalarmclock.AlarmTimePicker.MINUTE_KEY;
 import static vn.org.quan.hong.nguyen.myalarmclock.MainActivity.CANCEL_ALL_KEY;
 
-public interface Command {
+public class Command {
+
+    // avoid Init
+    private Command() {}
 
     public static void setupRecyclerView(List<Alarm> alarmList , Context context) {
         AlarmAdapter alarmAdapter = new AlarmAdapter(alarmList , context);
