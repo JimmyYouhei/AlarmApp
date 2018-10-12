@@ -32,39 +32,49 @@ import static vn.org.quan.hong.nguyen.myalarmclock.AlarmTimePicker.HOUR_KEY;
 import static vn.org.quan.hong.nguyen.myalarmclock.AlarmTimePicker.MINUTE_KEY;
 import static vn.org.quan.hong.nguyen.myalarmclock.MainActivity.CANCEL_ALL_KEY;
 
+
+// A central class for methods to easily read , maintain and reuse those methods
 public abstract class Command {
 
+
+    // setup RecyclerView
     public static void setupRecyclerView(List<Alarm> alarmList , Context context) {
         AlarmAdapter alarmAdapter = new AlarmAdapter(alarmList , context);
         RecyclerView recyclerView = ((Activity)context).findViewById(R.id.vRecyclerView);
         recyclerView.setAdapter(alarmAdapter);
     }
 
+    // cancel all pending intent and stop all playing alarm sound
     public static void resetAllPedingIntentAndService(Context context){
-
+        // get intent to cancel
         Intent oldSetAlarmIntent = new Intent(context.getApplicationContext() , AlarmReceiver.class );
         oldSetAlarmIntent.putExtra(AlarmAdapter.FROM_ALARM_ADAPTER_KEY , AlarmAdapter.SET_ALARM_KEY);
+        // alarm manager to cancel pending intent
         AlarmManager toCancel = (AlarmManager) context.getApplicationContext().getSystemService(Context.ALARM_SERVICE);
 
+        // make pending intent based on the position that is included in the requestCodeArrayList to cancel all pending intent
         for (int i = 0 ; i < AlarmAdapter.requestCodeArrayList.size(); i++ ){
             PendingIntent oldSetAlarmPendingIntent = PendingIntent.getBroadcast(context.getApplicationContext()
                     , AlarmAdapter.requestCodeArrayList.get(i) ,
                     oldSetAlarmIntent , PendingIntent.FLAG_UPDATE_CURRENT);
             toCancel.cancel(oldSetAlarmPendingIntent);
         }
+        // clear the requestCodeArrayList as finish their role and no more pending intent
         AlarmAdapter.requestCodeArrayList.clear();
+        // send broadcast to stop all playing service (if any) CANCEL_ALL_KEY will try to stop everything
         oldSetAlarmIntent.putExtra(AlarmAdapter.FROM_ALARM_ADAPTER_KEY,AlarmAdapter.STOP_KEY);
         oldSetAlarmIntent.putExtra(AlarmAdapter.ADAPTER_ID_KEY , CANCEL_ALL_KEY);
         context.getApplicationContext().sendBroadcast(oldSetAlarmIntent);
-
     }
 
+    // make alarm object based on intent received
     public static Alarm getOldAlarm (Intent data) {
         int oldHour = -1;
 
         String oldAlarmString = data.getStringExtra(AlarmAdapter.ViewHolder.OLD_HH_MM_STRING_KEY);
         String oldAmOrPm = data.getStringExtra(AlarmAdapter.ViewHolder.AM_PM_KEY);
 
+        // parse Hour (based on 24 hour clock) and minute based on String od intent
         if (oldAmOrPm.equals("Am")){
             oldHour = Integer.valueOf(oldAlarmString.substring(0,2));
         } else if (oldAmOrPm.equals("Pm")){
@@ -75,27 +85,37 @@ public abstract class Command {
         return new Alarm(oldHour , oldMinute);
     }
 
+    // setup Alarm when toggle button on
     public static void setupAlarm
             (Context context, AlarmAdapter.ViewHolder holder, Alarm alarm,
              ArrayList<Integer> requestCodeArrayList , boolean setAlarmForTomorrow){
 
+        // if cannot set alarm today
         if (setAlarmForTomorrow){
+            // add 1 to Date for tommorrow
             holder.alarmCalendar.add(Calendar.DATE , 1);
         }
 
+        // set Hour and Minute according to the alarm
         holder.alarmCalendar.set(Calendar.HOUR_OF_DAY , alarm.getHour());
         holder.alarmCalendar.set(Calendar.MINUTE , alarm.getMinute());
+        // set Second to 0 for uniform calendar
         holder.alarmCalendar.set(Calendar.SECOND , 0);
-        holder.setAlarmIntent = new Intent(context , AlarmReceiver .class );
+        // make pending intent and put extra for alarm service
+        holder.setAlarmIntent = new Intent(context , AlarmReceiver.class );
         holder.setAlarmIntent.putExtra(FROM_ALARM_ADAPTER_KEY , SET_ALARM_KEY);
         holder.setAlarmIntent.putExtra(ADAPTER_ID_KEY , holder.getAdapterPosition());
+        // request code as position in the Adapter
         holder.setAlarmPendingIntent = PendingIntent.getBroadcast(context , holder.getAdapterPosition() ,
                 holder.setAlarmIntent , PendingIntent.FLAG_UPDATE_CURRENT);
+        // add position to the arraylist for alarm service management
         requestCodeArrayList.add(holder.getAdapterPosition());
+        // set Repeat alarm
         holder.alarmManager.setRepeating(AlarmManager.RTC_WAKEUP ,
                 holder.alarmCalendar.getTimeInMillis() , AlarmManager.INTERVAL_DAY ,holder.setAlarmPendingIntent);
     }
 
+    // make intent when click on the Context menu and send Request Code according to what was click
     public static void sendIntentFromContextMenu
             (View alarmAdapterView , TextView txtHourMinute, TextView txtAmPm, int REQUEST_CODE) {
         Intent intent = new Intent(alarmAdapterView.getContext() , AlarmTimePicker.class);
@@ -110,8 +130,10 @@ public abstract class Command {
         ((Activity) alarmAdapterView.getContext()).startActivityForResult(intent , REQUEST_CODE);
     }
 
+    // make result intent that carry TimePicker information
     public static Intent extractIntentFromTimePicker (android.widget.TimePicker timePicker){
         Intent intent = new Intent();
+        // code depend on SDK
         if (Build.VERSION.SDK_INT >= 23){
         intent.putExtra(HOUR_KEY , timePicker.getHour());
         intent.putExtra(MINUTE_KEY , timePicker.getMinute());
@@ -122,6 +144,7 @@ public abstract class Command {
         return intent;
     }
 
+    // put old alarm information for delete or edit
     public static void putExtraInformationAboutOldAlarm (Intent intentFromMainActivity , Intent intentFromTimePicker){
         intentFromTimePicker.putExtra(OLD_HH_MM_STRING_KEY ,
                 intentFromMainActivity.getStringExtra(OLD_HH_MM_STRING_KEY));
@@ -129,6 +152,7 @@ public abstract class Command {
                 intentFromMainActivity.getStringExtra(AM_PM_KEY));
     }
 
+    //as the name said
     public static AlarmAdapter.ViewHolder inflateNewViewForAdapter (Context context, ViewGroup parent)  {
 
         LayoutInflater layoutInflater = LayoutInflater.from(context);

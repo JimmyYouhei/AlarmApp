@@ -8,14 +8,12 @@ import android.content.Intent;
 import android.support.annotation.NonNull;
 
 import java.util.UUID;
+// class for alarm object and annotation for Room
 
 @Entity
 public class Alarm {
 
-    @NonNull
-    public String getAlarmId() {
-        return alarmId;
-    }
+
 
     @PrimaryKey
     @NonNull
@@ -45,6 +43,13 @@ public class Alarm {
         }
 
         alarmId = sHour+sMinute+amOrPm;
+    }
+
+    // setter and getter for this class
+
+    @NonNull
+    public String getAlarmId() {
+        return alarmId;
     }
 
     private void setStringAccordingToIntMinute(int minute) {
@@ -122,6 +127,7 @@ public class Alarm {
         this.sMinute = sMinute;
     }
 
+    // toString for test purpose
     @Override
     public String toString() {
         return "Alarm{" +

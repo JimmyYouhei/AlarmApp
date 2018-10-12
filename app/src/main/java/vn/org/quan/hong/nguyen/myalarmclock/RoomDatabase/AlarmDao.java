@@ -8,6 +8,8 @@ import java.util.List;
 
 import vn.org.quan.hong.nguyen.myalarmclock.Alarm;
 
+// Dao for Room
+
 @Dao
 public interface AlarmDao {
 

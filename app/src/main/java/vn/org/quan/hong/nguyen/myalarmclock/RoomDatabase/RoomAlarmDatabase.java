@@ -7,6 +7,7 @@ import android.content.Context;
 
 import vn.org.quan.hong.nguyen.myalarmclock.Alarm;
 
+// Room abstract class to make SQLite
 @Database(entities = {Alarm.class} , version =  1)
 public abstract class RoomAlarmDatabase extends RoomDatabase {
 

@@ -14,6 +14,8 @@ import java.util.Calendar;
 
 import vn.org.quan.hong.nguyen.myalarmclock.MethodInterfaceEnum.Command;
 
+
+// Time Picker Activity
 public class AlarmTimePicker extends AppCompatActivity {
     private TextView title;
     private ImageButton btnBack;
@@ -28,25 +30,35 @@ public class AlarmTimePicker extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_time_picker);
 
+        // Tie the View to its place in layout
         title = findViewById(R.id.txtTimeTitle);
         btnBack = findViewById(R.id.btnBack);
         btnAdd = findViewById(R.id.btnAdd);
         timePicker = findViewById(R.id.timePicker);
 
+        //get intent detail from MainActivity
         intentFromMainActivity = getIntent();
 
+        // On Back Image Icon pressed
         btnBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                // Cancel the intent for result and get back to MainActivity
                 setResult(RESULT_CANCELED);
                 finish();
             }
         });
 
+        // get intent action from MainActivity to determine the text of this Activity's title and button
+
+        //case to add more alarm
         if (intentFromMainActivity.getAction().equals(Intent.ACTION_INSERT)){
+            // set Text
             title.setText("Add");
             btnAdd.setText("ADD");
 
+            // when click on the add Button
+            //set Result Ok and send back result intent with data
             btnAdd.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -55,10 +67,14 @@ public class AlarmTimePicker extends AppCompatActivity {
                 }
             });
 
+            //case edit an alarm
         } else if (intentFromMainActivity.getAction().equals(Intent.ACTION_EDIT)) {
+            //set Text;
             title.setText("Edit");
             btnAdd.setText("EDIT");
 
+            // when click on the edit Button
+            // set Result ok the send back the result itent to edit the alarm
             btnAdd.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -69,6 +85,7 @@ public class AlarmTimePicker extends AppCompatActivity {
 
                 }
             });
+            // if get the intent to delete then will still send the result intent back to delete
         } else if (intentFromMainActivity.getAction().equals(Intent.ACTION_DELETE)){
             setResult(RESULT_OK , intentFromMainActivity);
             finish();
@@ -77,6 +94,7 @@ public class AlarmTimePicker extends AppCompatActivity {
 
     }
 
+    // Hard back Button like Back image Button above
     @Override
     public void onBackPressed() {
         super.onBackPressed();
