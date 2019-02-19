@@ -1,15 +1,12 @@
 package vn.org.quan.hong.nguyen.myalarmclock;
 
-import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.ContextMenu;
-import android.view.LayoutInflater;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -22,7 +19,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-import vn.org.quan.hong.nguyen.myalarmclock.MethodInterfaceEnum.Command;
+import vn.org.quan.hong.nguyen.myalarmclock.method_interface_enum.Command;
 
 // feature: many alarm and seperate
 // feature : on off button 1 adapter will not affect other not finish

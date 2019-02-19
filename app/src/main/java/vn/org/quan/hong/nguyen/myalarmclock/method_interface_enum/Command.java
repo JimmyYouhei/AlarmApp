@@ -1,4 +1,4 @@
-package vn.org.quan.hong.nguyen.myalarmclock.MethodInterfaceEnum;
+package vn.org.quan.hong.nguyen.myalarmclock.method_interface_enum;
 
 import android.app.Activity;
 import android.app.AlarmManager;
@@ -7,7 +7,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -37,12 +36,7 @@ import static vn.org.quan.hong.nguyen.myalarmclock.MainActivity.CANCEL_ALL_KEY;
 public abstract class Command {
 
 
-    // setup RecyclerView
-    public static void setupRecyclerView(List<Alarm> alarmList , Context context) {
-        AlarmAdapter alarmAdapter = new AlarmAdapter(alarmList , context);
-        RecyclerView recyclerView = ((Activity)context).findViewById(R.id.vRecyclerView);
-        recyclerView.setAdapter(alarmAdapter);
-    }
+
 
     // cancel all pending intent and stop all playing alarm sound
     public static void resetAllPedingIntentAndService(Context context){

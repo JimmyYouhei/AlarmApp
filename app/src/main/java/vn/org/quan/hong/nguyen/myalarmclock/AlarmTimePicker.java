@@ -1,18 +1,14 @@
 package vn.org.quan.hong.nguyen.myalarmclock;
 
 import android.content.Intent;
-import android.os.Build;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
-import java.util.Calendar;
-
-import vn.org.quan.hong.nguyen.myalarmclock.MethodInterfaceEnum.Command;
+import vn.org.quan.hong.nguyen.myalarmclock.method_interface_enum.Command;
 
 
 // Time Picker Activity

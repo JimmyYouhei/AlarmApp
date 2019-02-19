@@ -3,7 +3,6 @@ package vn.org.quan.hong.nguyen.myalarmclock;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
 
 // BroadcastReceiver class to receive broadcast
 public class AlarmReceiver extends BroadcastReceiver {

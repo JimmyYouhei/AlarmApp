@@ -2,12 +2,8 @@ package vn.org.quan.hong.nguyen.myalarmclock;
 
 import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
-import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.PrimaryKey;
-import android.content.Intent;
 import android.support.annotation.NonNull;
-
-import java.util.UUID;
 // class for alarm object and annotation for Room
 
 @Entity

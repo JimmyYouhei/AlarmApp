@@ -1,12 +1,11 @@
 package vn.org.quan.hong.nguyen.myalarmclock;
 
-import android.app.AlarmManager;
-import android.app.PendingIntent;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -14,12 +13,19 @@ import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
-import vn.org.quan.hong.nguyen.myalarmclock.MethodInterfaceEnum.Command;
-import vn.org.quan.hong.nguyen.myalarmclock.RoomDatabase.RoomAlarmDatabase;
+import vn.org.quan.hong.nguyen.myalarmclock.event_for_event_bus.ListAndContextObject;
+import vn.org.quan.hong.nguyen.myalarmclock.method_interface_enum.Command;
+import vn.org.quan.hong.nguyen.myalarmclock.room_library.RoomAlarmDatabase;
 
 
 //Main Activity
@@ -33,9 +39,14 @@ public class MainActivity extends AppCompatActivity {
     public static final int EDIT_REQUEST_CODE = 1001;
     public static final String REQUEST_TYPE_KEY = "Request , Type";
     public static final int CANCEL_ALL_KEY = 1489;
+    // List for RecyclerView
     List<Alarm> malarmList = new ArrayList<>();
 
+    // Room Library to manipulate SQLite
     RoomAlarmDatabase alarmDatabase;
+
+    // exceutor for background Thread
+    private Executor excecutor = Executors.newSingleThreadExecutor();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,10 +58,17 @@ public class MainActivity extends AppCompatActivity {
 
         // if there is already an Database , convert Database to an ArrayList and setupRecyclerView
         // if no Data base exist will just let RecyclerView empty
-        if (alarmDatabase.alarmDao().countAlarm() != 0){
-            malarmList = alarmDatabase.alarmDao().getDatabse();
-            Command.setupRecyclerView(malarmList , this);
-        }
+        // Add code to make it run in background and then tranfer to main thread to setup RecyclerView
+
+        excecutor.execute(new Runnable() {
+            @Override
+            public void run() {
+                if (alarmDatabase.alarmDao().countAlarm() != 0){
+                    malarmList = alarmDatabase.alarmDao().getDatabse();
+                    setForTranferBetweenThreadAndMakeRecyclerView(malarmList, MainActivity.this);
+                }
+            }
+        });
 
         // tie the View to its place
         toolbar = findViewById(R.id.mainToolbar);
@@ -70,7 +88,8 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-
+        // Register the setForTranferBetweenThreadAndMakeRecyclerView for EventBus to run on MainThread
+        EventBus.getDefault().register(this);
     }
 
     // for when received result back
@@ -86,22 +105,30 @@ public class MainActivity extends AppCompatActivity {
 
             // check if the alarm object already exist in the database if not add to database
             if (!duplicateExist(malarmList , resultAlarm)){
-                malarmList.add(resultAlarm);
-                alarmDatabase.alarmDao().insertAlarm(resultAlarm);
+
+                // add code to run on the background thread
+                excecutor.execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        malarmList.add(resultAlarm);
+                        alarmDatabase.alarmDao().insertAlarm(resultAlarm);
+                    }
+                });
+
             }
 
 
             //if there is no pending intent then will setup RecyclerView
             if (AlarmAdapter.requestCodeArrayList.size() == 0){
 
-                Command.setupRecyclerView(malarmList , this);
+                setForTranferBetweenThreadAndMakeRecyclerView(malarmList, MainActivity.this);
 
                 // if there is pending intent then will reset all then setupRecyclerView
             } else {
 
                 Command.resetAllPedingIntentAndService(this);
 
-                Command.setupRecyclerView(malarmList , this);
+                setForTranferBetweenThreadAndMakeRecyclerView(malarmList, MainActivity.this);
 
             }
         }
@@ -120,15 +147,22 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
 
-            // reset all database
-            alarmDatabase.alarmDao().nukeDatabase();
-            // make new database base on the current List
-            alarmDatabase.alarmDao().insertAll(malarmList);
+
+            excecutor.execute(new Runnable() {
+                @Override
+                public void run() {
+                    // reset all database
+                    alarmDatabase.alarmDao().nukeDatabase();
+                    // make new database base on the current List
+                    alarmDatabase.alarmDao().insertAll(malarmList);
+                }
+            });
+
 
             // if there is no pending intent then will setup RecyclerView according to the modified List
             if (AlarmAdapter.requestCodeArrayList.size() == 0){
 
-                Command.setupRecyclerView(malarmList, this);
+                setForTranferBetweenThreadAndMakeRecyclerView(malarmList, MainActivity.this);
                 Log.d(TAG, "onActivityResult: " + AlarmAdapter.requestCodeArrayList.toString());
 
                 // there are pending intents will reset all pending intent and then do as above
@@ -136,7 +170,7 @@ public class MainActivity extends AppCompatActivity {
 
                 Command.resetAllPedingIntentAndService(this);
 
-                Command.setupRecyclerView(malarmList , this);
+                setForTranferBetweenThreadAndMakeRecyclerView(malarmList, MainActivity.this);
                 Log.d(TAG, "onActivityResult: " + AlarmAdapter.requestCodeArrayList.toString());
 
             }
@@ -164,21 +198,28 @@ public class MainActivity extends AppCompatActivity {
             }
 
             // reset all database and make new database as the new List
-            alarmDatabase.alarmDao().nukeDatabase();
-            alarmDatabase.alarmDao().insertAll(malarmList);
+
+            excecutor.execute(new Runnable() {
+                @Override
+                public void run() {
+                    alarmDatabase.alarmDao().nukeDatabase();
+                    alarmDatabase.alarmDao().insertAll(malarmList);
+                }
+            });
+
 
 
             //again like above check for if there is any pending itent and will work just like above for pending intent and RecyclerView
             if (AlarmAdapter.requestCodeArrayList.size() == 0){
 
-                Command.setupRecyclerView(malarmList , this);
+                setForTranferBetweenThreadAndMakeRecyclerView(malarmList, MainActivity.this);
                 Log.d(TAG, "onActivityResult: " + AlarmAdapter.requestCodeArrayList.toString());
 
             } else {
 
                 Command.resetAllPedingIntentAndService(this);
 
-                Command.setupRecyclerView(malarmList , this);
+                setForTranferBetweenThreadAndMakeRecyclerView(malarmList, MainActivity.this);
                 Log.d(TAG, "onActivityResult: " + AlarmAdapter.requestCodeArrayList.toString());
 
             }
@@ -205,6 +246,25 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         RoomAlarmDatabase.destroyInstance();
+        EventBus.getDefault().unregister(this);
         super.onDestroy();
+
     }
+
+    // tranfer from background thread and setup RecyclerView on MainThread
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void setupRecyclerView(ListAndContextObject object) {
+        List<Alarm> alarmList = object.getAlarmList();
+        Context context = object.getContext();
+        AlarmAdapter alarmAdapter = new AlarmAdapter(alarmList , context);
+        RecyclerView recyclerView = ((Activity)context).findViewById(R.id.vRecyclerView);
+        recyclerView.setAdapter(alarmAdapter);
+    }
+
+    // combination of both wrap the 2 List and Context in 1 pack and setupRecyclerView method above for quick calling
+    private void setForTranferBetweenThreadAndMakeRecyclerView(List<Alarm> alarmList , Context context){
+        ListAndContextObject object = new ListAndContextObject(alarmList , context);
+        EventBus.getDefault().post(object);
+    }
+
 }
