@@ -35,9 +35,6 @@ import static vn.org.quan.hong.nguyen.myalarmclock.MainActivity.CANCEL_ALL_KEY;
 // A central class for methods to easily read , maintain and reuse those methods
 public abstract class Command {
 
-
-
-
     // cancel all pending intent and stop all playing alarm sound
     public static void resetAllPedingIntentAndService(Context context){
         // get intent to cancel
