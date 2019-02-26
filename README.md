@@ -56,5 +56,6 @@ First it is a alarm app with more detail:
 -	This is also my first time to work with Intent , pending intent , Broadcast , Broadcast Receiver and service 
 -	By the time I was making the app the API 28 : Android 9.0(Pie) was not yet stable and I had a lot of error when working with constraint layout of this API
 
-
+## License
+Free Software that follow the MIT License . More detail can be see [here](https://github.com/JimmyYouhei/AlarmApp/blob/master/LICENSE)
 
