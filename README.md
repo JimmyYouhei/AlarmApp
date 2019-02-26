@@ -10,7 +10,7 @@ By the time this app was made , the API 28 was not yet stable.
 
 ## How to install 
 - If you have an Android OS phone please go to [google app store to](https://play.google.com/store/apps/details?id=vn.org.quan.hong.nguyen.myalarmclock) to install
-- If you want to work with the source code then open your android studio and use new -> Project From Version Control -> Git and paste _https://github.com/JimmyYouhei/AlarmApp.git_
+- If you want to work with the source code then open your android studio and use _new_ -> _Project From Version Control_ -> _Git_ and paste _https://github.com/JimmyYouhei/AlarmApp.git_
 
 ## How to use
 - You can push on the "+" on the main screen to choose a new alarm.
