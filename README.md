@@ -9,7 +9,7 @@ Alarm App  was made to learn more about activity , intent , pending intent , SQL
 
 ## How to install 
 -	If you have an Android OS phone please go to [google app store](https://play.google.com/store/apps/details?id=vn.org.quan.hong.nguyen.myalarmclock) to install
--	If you want to work with the source code then open your android studio and use  use _new_ -> _Project From Version Control_ -> _Git_ and paste _https://github.com/JimmyYouhei/AlarmApp.git_
+-	If you want to work with the source code then open your android studio and use _new_ -> _Project From Version Control_ -> _Git_ and paste _https://github.com/JimmyYouhei/AlarmApp.git_
 
 ## How to use
 -	Push on the "+" icon on the main screen to choose a new alarm.
